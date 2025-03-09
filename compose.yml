@@ -7,9 +7,12 @@ services:
       resources:
         limits:
           memory: 100M
-    privileged: true
     network_mode: host
-    tty: true
+    # caps/devices needed for hostapd
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/rfkill
     environment:
       INTERFACE: wlan0
       CHANNEL: 6
