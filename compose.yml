@@ -12,9 +12,11 @@ services:
     tty: true
     environment:
       INTERFACE: wlan0
-      CHANNEL: "6"
-      SSID: runssid
+      CHANNEL: 6
+      SSID: iot
       AP_ADDR: 192.168.254.1
       WPA_PASSPHRASE: passw0rd
+      COUNTRY_CODE: EU
+      HT_ENABLED: 1
     restart: unless-stopped
 
