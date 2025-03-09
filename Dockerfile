@@ -1,6 +1,6 @@
-FROM jonaskello/rpi-alpine-scratch-qemu
+FROM alpine:3
 
-MAINTAINER Sergio R. <sdelrio@users.noreply.github.com>
+#MAINTAINER Sergio R. <sdelrio@users.noreply.github.com>
 
 ENV VERSION 0.31
 

@@ -18,7 +18,7 @@ true ${SUBNET:=192.168.254.0}
 true ${AP_ADDR:=192.168.254.1}
 true ${PRI_DNS:=8.8.8.8}
 true ${SEC_DNS:=8.8.4.4}
-true ${SSID:=raspberry}
+true ${SSID:=iot}
 true ${CHANNEL:=11}
 true ${WPA_PASSPHRASE:=passw0rd}
 true ${HW_MODE:=g}
@@ -33,8 +33,6 @@ channel=${CHANNEL}
 wpa=2
 wpa_passphrase=${WPA_PASSPHRASE}
 wpa_key_mgmt=WPA-PSK
-# TKIP is no secure anymore
-#wpa_pairwise=TKIP CCMP
 wpa_pairwise=CCMP
 rsn_pairwise=CCMP
 wpa_ptk_rekey=600
@@ -73,7 +71,18 @@ done
 cat /proc/sys/net/ipv4/ip_dynaddr
 cat /proc/sys/net/ipv4/ip_forward
 
-if [ "${OUTGOINGS}" ] ; then
+if [ "${OUTGOINGS}" == "all" ] ; then
+   echo "Setting iptables for outgoing traffics on all interfaces..."
+
+   iptables -t nat -D POSTROUTING -s ${SUBNET}/24 -j MASQUERADE > /dev/null 2>&1 || true
+   iptables -t nat -A POSTROUTING -s ${SUBNET}/24 -j MASQUERADE
+
+   iptables -D FORWARD -o ${INTERFACE} -m state --state RELATED,ESTABLISHED -j ACCEPT > /dev/null 2>&1 || true
+   iptables -A FORWARD -o ${INTERFACE} -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+   iptables -D FORWARD -i ${INTERFACE} -j ACCEPT > /dev/null 2>&1 || true
+   iptables -A FORWARD -i ${INTERFACE} -j ACCEPT
+else if [ "${OUTGOINGS}" ] ; then
    ints="$(sed 's/,\+/ /g' <<<"${OUTGOINGS}")"
    for int in ${ints}
    do
@@ -89,16 +98,7 @@ if [ "${OUTGOINGS}" ] ; then
       iptables -A FORWARD -i ${INTERFACE} -o ${int} -j ACCEPT
    done
 else
-   echo "Setting iptables for outgoing traffics on all interfaces..."
-
-   iptables -t nat -D POSTROUTING -s ${SUBNET}/24 -j MASQUERADE > /dev/null 2>&1 || true
-   iptables -t nat -A POSTROUTING -s ${SUBNET}/24 -j MASQUERADE
-
-   iptables -D FORWARD -o ${INTERFACE} -m state --state RELATED,ESTABLISHED -j ACCEPT > /dev/null 2>&1 || true
-   iptables -A FORWARD -o ${INTERFACE} -m state --state RELATED,ESTABLISHED -j ACCEPT
-
-   iptables -D FORWARD -i ${INTERFACE} -j ACCEPT > /dev/null 2>&1 || true
-   iptables -A FORWARD -i ${INTERFACE} -j ACCEPT
+	echo "Not setting up iptables for forwarding."
 fi
 
 echo "Configuring DHCP server .."
@@ -127,7 +127,15 @@ wait $!
 
 echo "Removing iptables rules..."
 
-if [ "${OUTGOINGS}" ] ; then
+if [ "${OUTGOINGS}" == "all" ] ; then
+   echo "Setting iptables for outgoing traffics on all interfaces..."
+
+   iptables -t nat -D POSTROUTING -s ${SUBNET}/24 -j MASQUERADE > /dev/null 2>&1 || true
+
+   iptables -D FORWARD -o ${INTERFACE} -m state --state RELATED,ESTABLISHED -j ACCEPT > /dev/null 2>&1 || true
+
+   iptables -D FORWARD -i ${INTERFACE} -j ACCEPT > /dev/null 2>&1 || true
+else if [ "${OUTGOINGS}" ] ; then
    ints="$(sed 's/,\+/ /g' <<<"${OUTGOINGS}")"
    for int in ${ints}
    do
@@ -140,11 +148,6 @@ if [ "${OUTGOINGS}" ] ; then
       iptables -D FORWARD -i ${INTERFACE} -o ${int} -j ACCEPT > /dev/null 2>&1 || true
    done
 else
-   echo "Setting iptables for outgoing traffics on all interfaces..."
-
-   iptables -t nat -D POSTROUTING -s ${SUBNET}/24 -j MASQUERADE > /dev/null 2>&1 || true
-
-   iptables -D FORWARD -o ${INTERFACE} -m state --state RELATED,ESTABLISHED -j ACCEPT > /dev/null 2>&1 || true
-
-   iptables -D FORWARD -i ${INTERFACE} -j ACCEPT > /dev/null 2>&1 || true
+	echo "iptables already clean."
 fi
+
