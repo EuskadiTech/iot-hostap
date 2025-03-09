@@ -1,12 +1,5 @@
 #!/bin/bash -e
 
-
-# Check if running in privileged mode
-if [ ! -w "/sys" ] ; then
-    echo "[Error] Not running in privileged mode."
-    exit 1
-fi
-
 # Check environment variables
 if [ ! "${INTERFACE}" ] ; then
     echo "[Error] An interface must be specified."
