@@ -2,7 +2,7 @@ FROM alpine:3
 
 #MAINTAINER Sergio R. <sdelrio@users.noreply.github.com>
 
-ENV VERSION 0.31
+ENV VERSION=0.31
 
 RUN apk update \
 	&& apk add \
@@ -12,7 +12,7 @@ RUN apk update \
 		net-tools \
 		wireless-tools \
 	&& rm -rf /var/cache/apk/*
-RUN echo "" > /var/lib/dhcp/dhcpd.leases
+
 ADD wlanstart.sh /bin/wlanstart.sh
 
 ENTRYPOINT [ "/bin/wlanstart.sh" ]
