@@ -1,0 +1,20 @@
+services:
+  hostap:
+    image: ghcr.io/unspezifisch/iot-hostap
+    build:
+      context: .
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+    privileged: true
+    network_mode: host
+    tty: true
+    environment:
+      INTERFACE: wlan0
+      CHANNEL: "6"
+      SSID: runssid
+      AP_ADDR: 192.168.254.1
+      WPA_PASSPHRASE: passw0rd
+    restart: unless-stopped
+

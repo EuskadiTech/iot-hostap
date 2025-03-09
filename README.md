@@ -1,5 +1,7 @@
 # Docker container stack: hostap + dhcp server
 
+**Fork Note:** This is a fork of <https://github.com/sdelrio/rpi-hostap>, with updated packages, DHCP and iptables rules removed. Not actively maintained.
+
 Designed to work on **Raspberry Pi** (arm) using as base image alpine linux (very little size).
 
 # Idea
