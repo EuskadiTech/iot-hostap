@@ -32,8 +32,9 @@ wpa_passphrase=${WPA_PASSPHRASE}
 wpa_key_mgmt=WPA-PSK
 wpa_pairwise=CCMP
 rsn_pairwise=CCMP
-wpa_ptk_rekey=600
+wpa_ptk_rekey=3600
 wmm_enabled=1
+${COUNTRY_CODE+"country_code=${COUNTRY_CODE}"}
 
 # Activate channel selection for HT High Throughput (802.11an)
 
